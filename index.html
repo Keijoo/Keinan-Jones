@@ -1,0 +1,3055 @@
+<!DOCTYPE html>
+<!--
+  If you're reading the source, hi. This whole thing started as a song lyric
+  ("a drag path etched in the surface, as evidence I left there on purpose")
+  and turned into a portfolio. Thanks for actually looking. - Keinan
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keinan Jones</title>
+<meta name="description" content="Keinan Jones — developer from Wales, now in Finland. A scroll through where I've been, what I've built, and where I'm headed.">
+<meta property="og:title" content="Keinan Jones">
+<meta property="og:description" content="A developer's road from Wales to Finland — projects, skills, and the story behind them.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Keinan Jones">
+<meta name="twitter:description" content="A developer's road from Wales to Finland — projects, skills, and the story behind them.">
+<meta name="theme-color" content="#0a0a0f">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230a0a0f'/><g fill='none' stroke='%23ff6b4a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><line x1='8' y1='24' x2='22' y2='10'/><polyline points='15,10 22,10 22,17'/><line x1='6' y1='17' x2='16' y2='17'/></g></svg>">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --panel: #15151d;
+    --text: #e8e6e1;
+    --muted: #8a8a96;
+    --accent: #ff6b4a;
+    --steel: #4a5568;
+    --amber: #c9a87c;
+    --line: #2a2a35;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; scrollbar-width: none; -ms-overflow-style: none; }
+  html::-webkit-scrollbar { display: none; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ---- sagittarius background constellation ---- */
+  .sagittarius-bg {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(90vw, 700px);
+    height: auto;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.7;
+  }
+
+  .sag-star {
+    fill: rgba(255, 200, 160, 0.55);
+    animation: sag-twinkle 4s ease-in-out infinite;
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+
+  .sag-hit {
+    pointer-events: auto !important;
+  }
+
+  @keyframes sag-twinkle {
+    0%, 100% {
+      opacity: 0.35;
+      transform: scale(0.8);
+      filter: drop-shadow(0 0 2px rgba(255,107,74,0.3));
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.4);
+      filter: drop-shadow(0 0 6px rgba(255,180,100,0.9));
+    }
+  }
+
+  /* ---- cursor trail ---- */
+  .trail-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ---- audio button ---- */
+  .audio-btn {
+    position: fixed;
+    top: 1.2rem;
+    right: 1.5rem;
+    z-index: 200;
+    background: rgba(10,10,15,0.7);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.9rem;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.3s, color 0.3s, box-shadow 0.3s;
+    backdrop-filter: blur(8px);
+  }
+
+  .audio-btn:hover, .audio-btn.playing {
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 12px rgba(255,107,74,0.3);
+  }
+
+  /* ---- CV download ---- */
+  .cv-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 0.85rem 1.8rem;
+    border-radius: 3px;
+    text-decoration: none;
+    transition: background 0.3s, color 0.3s, transform 0.2s, box-shadow 0.3s;
+    white-space: nowrap;
+  }
+
+  .cv-download:hover {
+    background: var(--accent);
+    color: var(--bg);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,107,74,0.3);
+  }
+
+  /* ---- road connector dots ---- */
+  .waypoint.left .card::after,
+  .waypoint.right .card::after {
+    content: '';
+    position: absolute;
+    top: 2.4rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px rgba(255,107,74,0.6);
+    opacity: 0;
+    transition: opacity 0.6s ease 0.4s;
+  }
+
+  .waypoint.left .card::after {
+    right: calc(100% + 3.6rem);
+  }
+
+  .waypoint.right .card::after {
+    left: calc(100% + 3.6rem);
+  }
+
+  .waypoint .card.visible::after {
+    opacity: 1;
+  }
+
+  /* ---- connector line from card to road ---- */
+  .waypoint.left .card.visible::before {
+    box-shadow: inset 0 0 0 0 transparent;
+  }
+
+  /* ---- why hire me ---- */
+  .why-section {
+    padding: 6rem 0;
+    text-align: center;
+  }
+
+  .why-section .container {
+    max-width: 640px;
+  }
+
+  .why-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 2rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .why-eyebrow.visible { opacity: 1; transform: translateY(0); }
+
+  .why-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .why-line {
+    font-size: 1.05rem;
+    line-height: 1.9;
+    color: var(--muted);
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.9s ease calc(var(--wi) * 0.15s),
+                transform 0.9s ease calc(var(--wi) * 0.15s),
+                color 0.4s ease;
+    text-align: left;
+  }
+
+  .why-lines.visible .why-line {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .why-line:hover {
+    color: var(--text);
+  }
+
+  /* ---- ticker kbd hint ---- */
+  .ticker-hint kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    background: var(--line);
+    border: 1px solid var(--steel);
+    border-radius: 3px;
+    padding: 0.1rem 0.35rem;
+    color: var(--accent);
+    letter-spacing: 0;
+  }
+
+  /* ---- things I love ---- */
+  .love-section {
+    padding: 6rem 0;
+    text-align: center;
+  }
+
+  .love-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--steel);
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.8s ease, transform 0.8s ease, color 1s ease 0.3s;
+  }
+
+  .love-eyebrow.visible {
+    opacity: 1;
+    transform: translateY(0);
+    color: var(--accent);
+  }
+
+  .love-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    max-width: 820px;
+    margin: 0 auto;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 1s ease 0.2s, transform 1s ease 0.2s;
+  }
+
+  .love-grid.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .love-item {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1.5rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    text-align: left;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .love-item:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+  }
+
+  .love-icon {
+    font-size: 1.4rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .love-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .love-detail {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  @media (max-width: 640px) {
+    .love-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 420px) {
+    .love-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ---- currently ticker ---- */
+  .ticker-wrap {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 90;
+    overflow: hidden;
+    padding: 0.55rem 0;
+    border-top: 1px solid var(--line);
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+  }
+
+  .ticker-track {
+    display: flex;
+    width: max-content;
+    animation: ticker-scroll 30s linear infinite;
+  }
+
+  .ticker-track:hover {
+    animation-play-state: paused;
+  }
+
+  @keyframes ticker-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  .ticker-item {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    white-space: nowrap;
+    padding: 0 1.5rem;
+    transition: color 0.3s;
+  }
+
+  .ticker-track:hover .ticker-item {
+    color: var(--text);
+  }
+
+  .ticker-sep {
+    color: var(--accent);
+    opacity: 0.5;
+    font-size: 0.8rem;
+    align-self: center;
+  }
+
+  /* ---- ambient background glow ---- */
+  .ambient-glow {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 700px 900px at 20% 20%, rgba(255,107,74,0.05), transparent 60%),
+      radial-gradient(ellipse 800px 1000px at 80% 70%, rgba(201,168,124,0.04), transparent 60%);
+    background-size: 130% 130%;
+    animation: ambient-drift 24s ease-in-out infinite alternate;
+  }
+
+  @keyframes ambient-drift {
+    0% {
+      background-position: 0% 0%, 0% 0%;
+    }
+    50% {
+      background-position: 10% 15%, -10% -10%;
+    }
+    100% {
+      background-position: -8% 8%, 12% 6%;
+    }
+  }
+
+  /* ---- noise/static overlay, increases with scroll ---- */
+  .static-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    transition: opacity 0.4s ease;
+  }
+
+  /* ---- center road line ---- */
+  .road {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .road::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 2px;
+    height: 100%;
+    background: repeating-linear-gradient(
+      to bottom,
+      var(--steel) 0px,
+      var(--steel) 24px,
+      transparent 24px,
+      transparent 48px
+    );
+    animation: dash-move 1.2s linear infinite;
+    opacity: 0.4;
+  }
+
+  @keyframes dash-move {
+    from { background-position-y: 0; }
+    to { background-position-y: 48px; }
+  }
+
+  .marker {
+    position: fixed;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px 3px rgba(255,107,74,0.7), 0 0 30px 8px rgba(255,107,74,0.25);
+    z-index: 50;
+    transition: top 0.05s linear;
+    animation: marker-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes marker-pulse {
+    0%, 100% { box-shadow: 0 0 12px 3px rgba(255,107,74,0.7), 0 0 30px 8px rgba(255,107,74,0.25); }
+    50% { box-shadow: 0 0 18px 5px rgba(255,107,74,0.9), 0 0 45px 14px rgba(255,107,74,0.35); }
+  }
+
+  /* ---- sections ---- */
+  section {
+    position: relative;
+    width: 100%;
+    padding: 8rem 0;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    position: relative;
+  }
+
+  /* ---- hero ---- */
+  .hero {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 560px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(ellipse 600px 800px at 50% 50%, rgba(255,107,74,0.08), transparent 70%);
+    pointer-events: none;
+    animation: glow-pulse 6s ease-in-out infinite;
+  }
+
+  @keyframes glow-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.08); }
+  }
+
+  @keyframes photo-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .hero-photo-wrap {
+    margin-bottom: 1.5rem;
+    will-change: transform, opacity;
+  }
+
+  .hero-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fade-in 1.2s ease forwards 0.3s;
+  }
+
+  .hero-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(2.5rem, 8vw, 5.5rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    will-change: transform, opacity;
+  }
+
+  .hero-title .word {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(0.6em);
+    filter: blur(6px);
+    animation: word-reveal 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: calc(0.5s + var(--d) * 0.08s);
+  }
+
+  .hero-title .word.sub {
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 0.5em;
+  }
+
+  @keyframes word-reveal {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  }
+
+  .hero-sub {
+    margin-top: 1.5rem;
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 480px;
+    line-height: 1.7;
+    opacity: 0;
+    animation: fade-in 1.4s ease forwards 1s;
+  }
+
+  .find-me-tag {
+    margin-top: 1.25rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    opacity: 0;
+    animation: fade-in 1.4s ease forwards 1.3s;
+  }
+
+  .scroll-cue {
+    position: absolute;
+    bottom: 3rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--steel);
+    opacity: 0;
+    animation: fade-in 1.4s ease forwards 1.5s, bounce 2.5s ease-in-out infinite 1.5s;
+  }
+
+  @keyframes fade-in {
+    to { opacity: 1; }
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(8px); }
+  }
+
+  /* ---- raw / unguarded section ---- */
+  .raw-section {
+    padding: 6rem 0;
+    text-align: center;
+  }
+
+  .raw-section .container {
+    max-width: 620px;
+  }
+
+  .raw-text {
+    font-family: var(--font-serif, 'Inter', sans-serif);
+    font-style: italic;
+    font-size: 1.2rem;
+    line-height: 2;
+    color: var(--text);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1.4s ease, transform 1.4s ease;
+  }
+
+  .raw-text.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ---- evidence intro ---- */
+
+  /* ---- waypoints ---- */
+  .waypoint {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    align-items: center;
+    position: relative;
+  }
+
+  .waypoint .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 2.5rem;
+    max-width: 460px;
+    position: relative;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  }
+
+  .waypoint .card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .waypoint.left .card { justify-self: start; margin-right: auto; margin-left: calc(50% + 4rem); transform: translateY(40px) translateX(-20px); }
+  .waypoint.right .card { justify-self: end; margin-left: auto; margin-right: calc(50% + 4rem); transform: translateY(40px) translateX(20px); }
+  .waypoint.left .card.visible,
+  .waypoint.right .card.visible { transform: translateY(0) translateX(0); }
+
+  .waypoint .card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px -10px rgba(255,107,74,0.25);
+  }
+
+  .waypoint.left .card.visible:hover,
+  .waypoint.right .card.visible:hover {
+    transform: translateY(-4px) translateX(0);
+  }
+
+  .waypoint .card::before {
+    content: attr(data-marker);
+    position: absolute;
+    top: 2.2rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    opacity: 0;
+    transition: opacity 0.6s ease 0.3s;
+  }
+
+  .waypoint .card.visible::before {
+    opacity: 1;
+  }
+
+  .waypoint.left .card::before { right: calc(100% + 2rem); }
+  .waypoint.right .card::before { left: calc(100% + 2rem); }
+
+  .waypoint h2 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.6rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .waypoint p {
+    color: var(--muted);
+    line-height: 1.8;
+    font-size: 0.98rem;
+  }
+
+  .tag-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 1.25rem;
+  }
+
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    color: var(--amber);
+    transition: border-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+    display: inline-block;
+  }
+
+  .tag:hover {
+    border-color: var(--amber);
+    transform: translateY(-2px);
+  }
+
+  /* ---- memory section (deeper, more decayed) ---- */
+  .memory-section {
+    background: linear-gradient(to bottom, var(--bg), #060608);
+    padding: 10rem 0;
+    text-align: center;
+  }
+
+  .memory-section .container {
+    max-width: 640px;
+  }
+
+  .memory-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--steel);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+  .memory-eyebrow.visible { opacity: 1; }
+
+  .memory-text {
+    font-size: 1.15rem;
+    line-height: 2;
+    color: var(--text);
+    opacity: 0;
+    transition: opacity 1.2s ease 0.3s;
+  }
+  .memory-text.visible { opacity: 1; }
+
+  .memory-text em {
+    color: var(--accent);
+    font-style: normal;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+  }
+
+  .memory-text + .memory-text {
+    margin-top: 1.5rem;
+    color: var(--muted);
+    font-size: 1rem;
+  }
+
+  .memory-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-top: 3rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1s ease 0.5s, transform 1s ease 0.5s;
+  }
+  .memory-grid.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .memory-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.3s, transform 0.3s ease;
+  }
+  .memory-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+  }
+
+  .memory-icon {
+    font-style: normal;
+    font-size: 1.2rem;
+    color: var(--accent);
+    margin-bottom: 0.25rem;
+    display: inline-block;
+    transition: transform 0.3s ease;
+  }
+
+  .memory-card:hover .memory-icon {
+    transform: scale(1.2) rotate(8deg);
+  }
+
+  .memory-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  .memory-sub {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  @media (max-width: 600px) {
+    .memory-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ---- skills constellation ---- */
+  .constellation-section {
+    padding: 5rem 0 3rem;
+    text-align: center;
+  }
+
+  .constellation-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--steel);
+    margin-bottom: 1.5rem;
+    transition: color 0.6s ease;
+  }
+
+  .constellation-label.visible { color: var(--accent); }
+
+  .constellation-canvas {
+    display: block;
+    width: 100%;
+    max-width: 700px;
+    height: 340px;
+    margin: 0 auto;
+    opacity: 0;
+    transition: opacity 1.4s ease;
+  }
+
+  .constellation-canvas.visible { opacity: 1; }
+
+  /* ---- photo moment ---- */
+  .photo-moment {
+    padding: 2rem 0 4rem;
+    text-align: center;
+  }
+
+  .photo-frame {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
+    perspective: 1000px;
+  }
+
+  /* Option A: each photo item fades/slides in individually */
+  .photo-item {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .photo-item:nth-child(1) { transition-delay: 0s; }
+  .photo-item:nth-child(2) { transition-delay: 0.18s; }
+  .photo-item:nth-child(3) { transition-delay: 0.36s; }
+
+  .photo-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Option B: hover reveal — active photo brightens, others dim */
+  .photo-item img {
+    width: 220px;
+    height: 280px;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(50%) brightness(0.75);
+    transition: filter 0.4s ease, transform 0.4s ease, box-shadow 0.4s ease;
+    will-change: transform;
+  }
+
+  /* Glow behind active photo */
+  .photo-item::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 6px;
+    background: transparent;
+    transition: background 0.4s ease;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .photo-frame:hover .photo-item img {
+    filter: grayscale(60%) brightness(0.55);
+  }
+
+  .photo-frame:hover .photo-item:hover img {
+    filter: grayscale(0%) brightness(1.05);
+    box-shadow: 0 12px 40px rgba(255,107,74,0.25);
+  }
+
+  .photo-frame:hover .photo-item:hover::after {
+    background: radial-gradient(ellipse at center, rgba(255,107,74,0.15), transparent 70%);
+  }
+
+  .photo-caption {
+    width: 100%;
+    text-align: center;
+    margin-top: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--steel);
+    font-style: italic;
+  }
+
+  /* ---- stats section ---- */
+  .stats-section {
+    padding: 5rem 0 3rem;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    max-width: 820px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .stat-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .stat-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    line-height: 1.4;
+  }
+
+  @media (max-width: 600px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ---- honest skills ---- */
+  .skills-honest {
+    padding: 4rem 0 6rem;
+  }
+
+  .skills-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-align: center;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+
+  .skills-eyebrow.visible { opacity: 1; }
+
+  .skills-columns {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    max-width: 820px;
+    margin: 0 auto;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1s ease 0.2s, transform 1s ease 0.2s;
+  }
+
+  .skills-columns.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .skills-col-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--steel);
+    margin-bottom: 1rem;
+  }
+
+  .skill-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .skill-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text);
+    min-width: 90px;
+    flex-shrink: 0;
+  }
+
+  .skill-bar {
+    flex: 1;
+    height: 3px;
+    background: var(--line);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .skill-fill {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(to right, var(--accent), var(--amber));
+    border-radius: 2px;
+    transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .skills-columns.visible .skill-fill {
+    width: var(--w);
+  }
+
+  @media (max-width: 640px) {
+    .skills-columns { grid-template-columns: 1fr; }
+  }
+
+  /* ---- contact modal ---- */
+  .contact-btn.primary {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    color: var(--bg);
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 0.9rem 2rem;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s, transform 0.2s;
+    text-decoration: none;
+  }
+
+  .contact-btn.primary:hover {
+    background: transparent;
+    color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,107,74,0.2);
+  }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(6px);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal-box {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 2.5rem;
+    width: min(480px, 90vw);
+    position: relative;
+    transform: translateY(30px) scale(0.97);
+    transition: transform 0.3s cubic-bezier(0.22,1,0.36,1);
+  }
+
+  .modal-overlay.open .modal-box {
+    transform: translateY(0) scale(1);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 0.5rem; right: 0.5rem;
+    width: 2.6rem;
+    height: 2.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+  }
+
+  .modal-close:hover { color: var(--accent); }
+
+  .modal-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .modal-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--text);
+  }
+
+  .modal-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .modal-fields input,
+  .modal-fields textarea {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    color: var(--text);
+    padding: 0.75rem 1rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  .modal-fields input:focus,
+  .modal-fields textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255,107,74,0.1);
+  }
+
+  .modal-fields textarea {
+    min-height: 110px;
+    resize: vertical;
+  }
+
+  .modal-send-btn {
+    display: block;
+    text-align: center;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 3px;
+    padding: 0.85rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.3s, color 0.3s, transform 0.2s;
+  }
+
+  .modal-send-btn:hover {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    transform: translateY(-2px);
+  }
+
+  /* ---- contact btn (used in end-path) ---- */
+  /* ---- end contact form ---- */
+  .end-contact-form {
+    margin: 2rem auto 0;
+    max-width: 480px;
+    text-align: left;
+  }
+
+  .end-form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .end-form-fields input,
+  .end-form-fields textarea {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    color: var(--text);
+    padding: 0.75rem 1rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+
+  .end-form-fields input:focus,
+  .end-form-fields textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255,107,74,0.1);
+  }
+
+  .end-form-fields textarea {
+    min-height: 110px;
+    resize: vertical;
+  }
+
+  .end-form-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .response-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--steel);
+    margin-top: 0.85rem;
+    letter-spacing: 0.03em;
+    text-align: center;
+  }
+
+  /* ---- can you find me repetition ---- */
+  .find-me-repeat {
+    text-align: center;
+    padding: 6rem 0 2rem;
+  }
+
+  .find-line {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(1rem, calc(1.4rem - var(--i) * 0.12rem), 2rem);
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    opacity: calc(1 - var(--i) * 0.18);
+    margin-bottom: calc(0.5rem + var(--i) * 0.6rem);
+    filter: blur(calc(var(--i) * 0.6px));
+    transform: scale(calc(1 - var(--i) * 0.04));
+  }
+
+  .find-line:last-child {
+    color: var(--accent);
+  }
+
+  .found-it {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 1s ease, transform 1s ease;
+    margin-bottom: 0.5rem;
+  }
+
+  .found-it.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ---- footer / end of path ---- */
+  .end-path {
+    text-align: center;
+    padding: 6rem 0 10rem;
+    position: relative;
+  }
+
+  .end-path .marker-end {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+    margin: 0 auto 2rem;
+    animation: end-marker-pulse 2.5s ease-in-out infinite;
+  }
+
+  @keyframes end-marker-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,74,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(255,107,74,0); }
+  }
+
+  .end-path p {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--steel);
+  }
+
+  .end-links {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+  .end-links a {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.3s;
+  }
+  .end-links a:hover {
+    color: var(--accent);
+  }
+
+  @media (max-width: 768px) {
+    .road { left: 1.5rem; }
+    .marker { left: 1.5rem; }
+    .waypoint .card { margin: 0 0 0 3.5rem !important; justify-self: start !important; max-width: none; }
+    .waypoint .card::before { left: -3.2rem !important; right: auto !important; top: 2.2rem; transform: rotate(0); writing-mode: vertical-rl; }
+    .waypoint .card::after { left: -3.6rem !important; right: auto !important; }
+
+    /* Hero */
+    .hero-title { font-size: clamp(2rem, 10vw, 3.5rem); }
+    .hero-sub { font-size: 0.95rem; padding: 0 1rem; }
+    .find-me-tag { font-size: 0.75rem; }
+
+    /* Stats */
+    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    .stat-number { font-size: 1.8rem; }
+
+    /* Skills */
+    .skills-columns { grid-template-columns: 1fr; gap: 1.5rem; }
+    .skill-name { min-width: 80px; font-size: 0.75rem; }
+
+    /* Love grid */
+    .love-grid { grid-template-columns: 1fr 1fr; }
+
+    /* Why lines */
+    .why-lines { padding: 0 0.5rem; }
+    .why-line { font-size: 0.95rem; }
+
+    /* Constellation */
+    .constellation-canvas { height: 220px; }
+
+    /* End section on mobile */
+    .end-path { padding: 3rem 0 6rem; text-align: left; }
+    .end-path .marker-end {
+      margin: 0 0 1.5rem 0.25rem;
+      position: relative;
+      left: calc(1.5rem - 7px);
+    }
+    .found-it { font-size: 1.2rem; }
+    .end-contact-form { margin-top: 1.5rem; }
+    .end-form-actions {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .end-form-actions .contact-btn { flex: 1; min-width: 140px; text-align: center; }
+    .end-form-actions .cv-download { flex: 1; min-width: 140px; text-align: center; margin-left: 0; }
+    .end-links {
+      flex-wrap: wrap;
+      gap: 0.6rem 1rem;
+      justify-content: flex-start;
+      margin-top: 2rem;
+    }
+    .end-links a { font-size: 0.78rem; }
+
+    /* Audio button */
+    .audio-btn { top: 0.8rem; right: 0.8rem; width: 2.6rem; height: 2.6rem; }
+
+    /* Ticker */
+    .ticker-wrap { padding: 0.4rem 0; }
+
+    /* Memory cards */
+    .memory-grid { grid-template-columns: 1fr; }
+
+    /* Photo */
+    .photo-item img { width: 160px; height: 210px; }
+
+    /* Modal */
+    .modal-box { padding: 1.75rem; }
+  }
+
+  @media (max-width: 420px) {
+    .love-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .hero-title { font-size: clamp(1.8rem, 9vw, 2.8rem); }
+    .container { padding: 0 1.25rem; }
+    .end-form-actions { flex-direction: column; }
+    .end-form-actions .contact-btn,
+    .end-form-actions .cv-download { width: 100%; box-sizing: border-box; margin-left: 0; }
+    .modal-box { width: 92vw; padding: 1.5rem; }
+  }
+
+  .sagittarius-bg.acknowledged {
+    animation: sag-acknowledge 1.2s ease;
+  }
+
+  @keyframes sag-acknowledge {
+    0% { opacity: 0.7; filter: brightness(1); }
+    40% { opacity: 1; filter: brightness(1.8) drop-shadow(0 0 20px rgba(255,107,74,0.6)); }
+    100% { opacity: 0.7; filter: brightness(1); }
+  }
+
+  .sag-tooltip {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, calc(-50% - 90px)) scale(0.85);
+    background: rgba(10,10,15,0.95);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    white-space: nowrap;
+  }
+
+  .sag-tooltip.visible {
+    opacity: 1;
+    transform: translate(-50%, calc(-50% - 90px)) scale(1);
+  }
+
+  /* ---- finland gallery ---- */
+  .finland-section {
+    padding: 6rem 0;
+  }
+
+  .finland-section .section-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--steel);
+    margin-bottom: 2.5rem;
+  }
+
+  .finland-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .finland-photo {
+    aspect-ratio: 4/5;
+    overflow: hidden;
+    border-radius: 2px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease, transform 0.8s ease, filter 0.4s ease;
+    filter: grayscale(20%);
+  }
+
+  .finland-photo.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .finland-photo:hover {
+    filter: grayscale(0%);
+  }
+
+  .finland-photo:nth-child(2) { transition-delay: 0.15s; }
+  .finland-photo:nth-child(3) { transition-delay: 0.3s; }
+
+  .finland-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease;
+  }
+
+  .finland-photo:hover img {
+    transform: scale(1.04);
+  }
+
+  @media (max-width: 768px) {
+    .finland-gallery {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+    .finland-photo {
+      aspect-ratio: 16/9;
+    }
+  }
+
+  /* ---- page load fade-in ---- */
+  .page-fade {
+    position: fixed;
+    inset: 0;
+    background: #0a0a0f;
+    z-index: 9998;
+    pointer-events: none;
+    animation: page-fade-out 0.8s ease forwards 0.1s;
+  }
+
+  @keyframes page-fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; visibility: hidden; }
+  }
+
+  /* ---- reduced motion: disable decorative animation ---- */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+    .trail-canvas, .sagittarius-bg { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-fade"></div>
+<div class="ambient-glow"></div>
+<div class="static-overlay" id="staticOverlay"></div>
+
+<canvas id="trailCanvas" class="trail-canvas"></canvas>
+
+<svg class="sagittarius-bg" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <filter id="starGlow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="lineGlow">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Constellation lines - teapot asterism of Sagittarius -->
+  <g stroke="rgba(255,107,74,0.3)" stroke-width="1.2" fill="none" filter="url(#lineGlow)">
+    <!-- Teapot body -->
+    <line x1="180" y1="320" x2="230" y2="290"/>
+    <line x1="230" y1="290" x2="290" y2="270"/>
+    <line x1="290" y1="270" x2="340" y2="290"/>
+    <line x1="340" y1="290" x2="350" y2="340"/>
+    <line x1="350" y1="340" x2="300" y2="360"/>
+    <line x1="300" y1="360" x2="240" y2="355"/>
+    <line x1="240" y1="355" x2="180" y2="320"/>
+    <!-- Teapot spout -->
+    <line x1="180" y1="320" x2="140" y2="300"/>
+    <line x1="140" y1="300" x2="110" y2="275"/>
+    <line x1="110" y1="275" x2="125" y2="250"/>
+    <!-- Teapot lid -->
+    <line x1="290" y1="270" x2="285" y2="235"/>
+    <line x1="285" y1="235" x2="310" y2="215"/>
+    <!-- Teapot handle -->
+    <line x1="340" y1="290" x2="375" y2="275"/>
+    <line x1="375" y1="275" x2="385" y2="315"/>
+    <line x1="385" y1="315" x2="350" y2="340"/>
+  </g>
+
+  <!-- Stars with glow filter -->
+  <g filter="url(#starGlow)">
+    <!-- Kaus Australis - brightest -->
+    <circle class="sag-star" cx="300" cy="360" r="5" style="animation-delay:0s"/>
+    <!-- Nunki -->
+    <circle class="sag-star" cx="375" cy="275" r="4.5" style="animation-delay:0.6s"/>
+    <!-- Kaus Media -->
+    <circle class="sag-star" cx="290" cy="270" r="4" style="animation-delay:1.1s"/>
+    <!-- Kaus Borealis -->
+    <circle class="sag-star" cx="285" cy="235" r="3.5" style="animation-delay:0.3s"/>
+    <!-- Ascella -->
+    <circle class="sag-star" cx="350" cy="340" r="4" style="animation-delay:1.7s"/>
+    <!-- Albaldah -->
+    <circle class="sag-star" cx="310" cy="215" r="3" style="animation-delay:0.8s"/>
+    <!-- Phi Sgr -->
+    <circle class="sag-star" cx="340" cy="290" r="3.2" style="animation-delay:1.4s"/>
+    <!-- Tau Sgr - spout tip -->
+    <circle class="sag-star" cx="125" cy="250" r="3" style="animation-delay:0.5s"/>
+    <!-- Sigma Sgr -->
+    <circle class="sag-star" cx="110" cy="275" r="2.8" style="animation-delay:2s"/>
+    <!-- Rho Sgr - handle -->
+    <circle class="sag-star" cx="385" cy="315" r="2.5" style="animation-delay:1s"/>
+    <!-- Base stars -->
+    <circle class="sag-star" cx="230" cy="290" r="2.8" style="animation-delay:1.6s"/>
+    <circle class="sag-star" cx="240" cy="355" r="2.5" style="animation-delay:0.2s"/>
+    <circle class="sag-star" cx="180" cy="320" r="2.5" style="animation-delay:1.3s"/>
+    <circle class="sag-star" cx="140" cy="300" r="2.2" style="animation-delay:0.9s"/>
+  </g>
+
+  <!-- Sagittarius arrow symbol, placed elegantly near top-right -->
+  <g stroke="rgba(255,107,74,0.55)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <line x1="390" y1="175" x2="440" y2="125"/>
+    <line x1="440" y1="125" x2="424" y2="123"/>
+    <line x1="440" y1="125" x2="442" y2="141"/>
+    <line x1="376" y1="142" x2="416" y2="142"/>
+    <circle cx="376" cy="142" r="2.5" fill="rgba(255,107,74,0.55)" stroke="none"/>
+    <circle cx="416" cy="142" r="2.5" fill="rgba(255,107,74,0.55)" stroke="none"/>
+  </g>
+</svg>
+
+<button class="audio-btn" id="audioBtn" title="Toggle ambient audio" aria-label="Toggle ambient audio">♪</button>
+<audio id="ambientAudio" loop>
+  <source src="I Will Go To You 4.mp3" type="audio/mpeg">
+</audio>
+
+<div class="ticker-wrap">
+  <div class="ticker-track" id="tickerTrack">
+    <span class="ticker-item">📍 Lohja, Finland</span>
+    <span class="ticker-sep">·</span>
+    <span class="ticker-item">🎓 studying Computer Programming at Luksia</span>
+    <span class="ticker-sep">·</span>
+    <span class="ticker-item">🎮 probably playing something</span>
+    <span class="ticker-sep">·</span>
+    <span class="ticker-item">🔨 building things I care about</span>
+    <span class="ticker-sep">·</span>
+    <span class="ticker-item">🌍 Welsh in Finland</span>
+    <span class="ticker-sep">·</span>
+    <span class="ticker-item">💬 learning Finnish</span>
+    <span class="ticker-sep">·</span>
+    <span class="ticker-item">🗓 last updated <span id="lastUpdated">June 2026</span></span>
+    <span class="ticker-sep">·</span>
+    <span class="ticker-item ticker-hint">press <kbd>K</kbd> to say hi · tap ♪ seven times for a secret</span>
+    <span class="ticker-sep">·</span>
+    <span class="ticker-item">📍 Lohja, Finland</span>
+    <span class="ticker-sep">·</span>
+    <span class="ticker-item">🎓 studying Computer Programming at Luksia</span>
+    <span class="ticker-sep">·</span>
+    <span class="ticker-item">🎮 probably playing something</span>
+    <span class="ticker-sep">·</span>
+    <span class="ticker-item">🔨 building things I care about</span>
+    <span class="ticker-sep">·</span>
+    <span class="ticker-item">🌍 Welsh in Finland</span>
+    <span class="ticker-sep">·</span>
+    <span class="ticker-item">💬 learning Finnish</span>
+    <span class="ticker-sep">·</span>
+    <span class="ticker-item">🗓 last updated <span id="lastUpdated2">June 2026</span></span>
+    <span class="ticker-sep">·</span>
+    <span class="ticker-item ticker-hint">press <kbd>K</kbd> to say hi · tap ♪ seven times for a secret</span>
+    <span class="ticker-sep">·</span>
+  </div>
+</div>
+
+<div class="road"></div>
+<div class="marker" id="marker"></div>
+
+<section class="hero">
+  <div class="hero-photo-wrap">
+    <img src="Photos/hero.jpg" alt="Keinan Jones" style="width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line); opacity: 0; animation: fade-in 1.2s ease forwards 0.1s, photo-float 6s ease-in-out infinite 1.5s;">
+  </div>
+  <div class="hero-label">still finding my way</div>
+  <h1 class="hero-title">
+    <span class="word" style="--d: 0">Keinan</span>
+    <span class="word" style="--d: 1">Jones</span><br>
+    <span class="word sub" style="--d: 2">developer,</span>
+    <span class="word sub" style="--d: 3">gamer,</span>
+    <span class="word sub" style="--d: 4">work</span>
+    <span class="word sub" style="--d: 5">in</span>
+    <span class="word sub" style="--d: 6">progress</span>
+  </h1>
+  <p class="hero-sub">If you're reading this, scroll. This is the road from Ebbw Vale to Finland, from first jobs to first commits. What I built, who I became, and what I wanted you to know.</p>
+  <p class="find-me-tag">built by trial, error, and a bit of stubbornness</p>
+  <div class="scroll-cue">scroll to begin ↓</div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="waypoint left">
+      <div class="card" data-marker="mile 00 · 1999">
+        <h2>The beginning</h2>
+        <p>Born 6th December 1999, Ebbw Vale, Wales. A small town in the South Wales Valleys. I grew up there, knew its streets, and didn't think much about leaving until I did.</p>
+        <div class="tag-row">
+          <span class="tag">Ebbw Vale, Wales</span>
+          <span class="tag">6 Dec 1999</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="waypoint right">
+      <div class="card" data-marker="mile 01 · 2015–2018">
+        <h2>Coleg Gwent</h2>
+        <p>A-Levels in ICT, Media Studies, Business, Photography, and Welsh Bacc. School was okay. What I remember more is working tables at The Hobby Horse Inn from age 15, learning that if you talk to people and actually listen, everything goes smoother. That stuck with me.</p>
+        <div class="tag-row">
+          <span class="tag">Ebbw Vale</span>
+          <span class="tag">A-Levels</span>
+          <span class="tag">first job</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="waypoint left">
+      <div class="card" data-marker="mile 02 · 2019–2021">
+        <h2>University of South Wales</h2>
+        <p>Bachelor's in Applied Computing, Cardiff. Second-class honours, upper division (2:1). This is where I first properly got into code, not just dipping my toes but actually sitting with it, breaking things, building things, staying up too late working out why something wouldn't compile.</p>
+        <div class="tag-row">
+          <span class="tag">Cardiff</span>
+          <span class="tag">Applied Computing</span>
+          <span class="tag">2:1</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="waypoint right">
+      <div class="card" data-marker="mile 03 · 2022">
+        <h2>Wales → Finland</h2>
+        <p>Packed up and moved to Lohja, Finland, to be with my Finnish girlfriend. A new country, a new language, a new version of the road. I started from scratch in a lot of ways, and I'm glad I did.</p>
+        <div class="tag-row">
+          <span class="tag">Lohja</span>
+          <span class="tag">love</span>
+          <span class="tag">new chapter</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="photo-moment">
+  <div class="container">
+    <div class="photo-frame" id="photoFrame">
+      <div class="photo-item"><img src="Photos/photo-1.jpg" alt="Finland" /></div>
+      <div class="photo-item"><img src="Photos/photo-2.jpg" alt="Finland" /></div>
+      <div class="photo-item"><img src="Photos/photo-3.jpg" alt="Finland" /></div>
+      <p class="photo-caption">somewhere in Finland, still figuring it out</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="waypoint left">
+      <div class="card" data-marker="mile 04 · 2023–2024">
+        <h2>Learning to belong</h2>
+        <p>Finnish language studies at Luksia, reaching B1 level. Six weeks of work experience at Euronics in Lohja, learning Finnish working culture from the inside. Language is slow and humbling and worth it. I kept going.</p>
+        <div class="tag-row">
+          <span class="tag">Finnish B1</span>
+          <span class="tag">Luksia</span>
+          <span class="tag">Euronics</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="waypoint right">
+      <div class="card" data-marker="mile 05 · 2025–present">
+        <h2>Back to code</h2>
+        <p>Computer Programming at Luksia, Lohja, January 2025 and still going. This time with more life behind me. More patience. More reason to build things that actually matter to real people in a real place I now call home.</p>
+        <div class="tag-row">
+          <span class="tag">Luksia</span>
+          <span class="tag">Computer Programming</span>
+          <span class="tag">present</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="constellation-section">
+  <div class="container">
+    <p class="constellation-label">what I know so far</p>
+    <canvas id="constellationCanvas" class="constellation-canvas"></canvas>
+  </div>
+</section>
+
+
+<section>
+  <div class="container">
+    <div class="waypoint left">
+      <div class="card" data-marker="mile 06">
+        <h2>Spotless Spaces</h2>
+        <p>A website built for Lohjan sillä siisti, a local cleaning company. Clean layout, clear info, the kind of practical site a real business could actually use. This one was less about showing off and more about building something useful from start to finish.</p>
+        <div class="tag-row">
+          <span class="tag">html</span>
+          <span class="tag">css</span>
+          <span class="tag">client work</span>
+        </div>
+        <p style="margin-top: 1rem;"><a href="https://github.com/Keijoo/Lohjan-sill-siisti" style="color: var(--accent); text-decoration: none;">View project →</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="waypoint right">
+      <div class="card" data-marker="mile 07">
+        <h2>Cat Potion Game</h2>
+        <p>A work-in-progress game built in Unreal Engine. The kind of project that never really finishes, because every time I opened it I had a new idea for it. That's probably how it should be.</p>
+        <div class="tag-row">
+          <span class="tag">unreal engine</span>
+          <span class="tag">game dev</span>
+          <span class="tag">wip</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="waypoint left">
+      <div class="card" data-marker="mile 08">
+        <h2>The little things</h2>
+        <p>A tic-tac-toe game, a tip calculator, a gallery built in Unreal. None of these were trying to change the world. They were how I learned: small, finished, working things. Sometimes that's the whole point.</p>
+        <div class="tag-row">
+          <span class="tag">html / js / css</span>
+          <span class="tag">unreal engine</span>
+        </div>
+        <p style="margin-top: 1rem;">
+          <a href="https://keijoo.github.io/TikTakToe2/" style="color: var(--accent); text-decoration: none;">Tic-tac-toe →</a><br>
+          <a href="https://keijoo.github.io/Tip-Calculator/" style="color: var(--accent); text-decoration: none;">Tip calculator →</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="waypoint right">
+      <div class="card" data-marker="mile 09">
+        <h2>Python game (uni)</h2>
+        <p>Built during university, a Python game that showed me what it felt like to make something that actually ran, moved, and responded. It wasn't pretty, but it was mine. That feeling is probably why I kept going.</p>
+        <div class="tag-row">
+          <span class="tag">python</span>
+          <span class="tag">university project</span>
+          <span class="tag">2020</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="waypoint left">
+      <div class="card" data-marker="mile 10 · recent">
+        <h2>Birthday card</h2>
+        <p>A birthday card built with Next.js. Not a project for a client, not for a portfolio, just something I made for someone I care about. Sometimes the best reason to build something is because you want to make one person smile.</p>
+        <div class="tag-row">
+          <span class="tag">next.js</span>
+          <span class="tag">react</span>
+          <span class="tag">made with love</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="love-section">
+  <div class="container">
+    <p class="love-eyebrow" id="loveEyebrow">things I love</p>
+    <div class="love-grid" id="loveGrid">
+      <div class="love-item">
+        <span class="love-icon">🎮</span>
+        <span class="love-name">Video games</span>
+        <span class="love-detail">RPGs, strategy, anything with a good story. Gaming was probably what made me want to build things in the first place.</span>
+      </div>
+      <div class="love-item">
+        <span class="love-icon">🎵</span>
+        <span class="love-name">Music</span>
+        <span class="love-detail">Twenty One Pilots, obviously. But also whatever pulls me into a mood when I'm coding at midnight.</span>
+      </div>
+      <div class="love-item">
+        <span class="love-icon">🏋️</span>
+        <span class="love-name">The gym</span>
+        <span class="love-detail">The one hour a day where the only problem to solve is the next set. Clears the head like nothing else.</span>
+      </div>
+      <div class="love-item">
+        <span class="love-icon">🌲</span>
+        <span class="love-name">Finland</span>
+        <span class="love-detail">The quiet, the forests, the lakes. Somewhere along the way it stopped being a country I moved to and started being home.</span>
+      </div>
+      <div class="love-item">
+        <span class="love-icon">📸</span>
+        <span class="love-name">Exploring</span>
+        <span class="love-detail">New places, new streets. I'll walk somewhere with no plan and see what I find. Wales taught me to wander, Finland taught me to appreciate it.</span>
+      </div>
+      <div class="love-item">
+        <span class="love-icon">💻</span>
+        <span class="love-name">Building things</span>
+        <span class="love-detail">Not just for work. For fun. Because an idea in your head that doesn't exist yet is one of the most exciting things there is.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="why-section">
+  <div class="container">
+    <p class="why-eyebrow" id="whyEyebrow">why hire me</p>
+    <div class="why-lines" id="whyLines">
+      <p class="why-line" style="--wi:0">I show up. Even when things are hard, unfamiliar, or in a language I'm still learning.</p>
+      <p class="why-line" style="--wi:1">I learn fast and I'm honest about what I don't know yet, which means I actually fix problems instead of hiding them.</p>
+      <p class="why-line" style="--wi:2">I've lived and worked in two countries, learned a third language from scratch, and built things in my spare time just because I wanted to. That's not on a CV. But it's who I am.</p>
+      <p class="why-line" style="--wi:3">I care more than I usually let on. About the work, about the people, about doing it properly.</p>
+    </div>
+  </div>
+</section>
+
+<section class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item" id="finlandCounter">
+        <span class="stat-number" id="finlandDays">...</span>
+        <span class="stat-label">days in Finland</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">2:1</span>
+        <span class="stat-label">degree, Applied Computing</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">B1</span>
+        <span class="stat-label">Finnish language level</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" id="yearsCount">...</span>
+        <span class="stat-label">years writing code</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="skills-honest">
+  <div class="container">
+    <p class="skills-eyebrow">what I actually know</p>
+    <div class="skills-columns">
+      <div class="skills-col">
+        <p class="skills-col-label">comfortable</p>
+        <div class="skill-row"><span class="skill-name">HTML / CSS</span><span class="skill-bar"><span class="skill-fill" style="--w:92%"></span></span></div>
+        <div class="skill-row"><span class="skill-name">JavaScript</span><span class="skill-bar"><span class="skill-fill" style="--w:80%"></span></span></div>
+        <div class="skill-row"><span class="skill-name">Python</span><span class="skill-bar"><span class="skill-fill" style="--w:75%"></span></span></div>
+        <div class="skill-row"><span class="skill-name">Unreal Engine</span><span class="skill-bar"><span class="skill-fill" style="--w:70%"></span></span></div>
+        <div class="skill-row"><span class="skill-name">Git</span><span class="skill-bar"><span class="skill-fill" style="--w:72%"></span></span></div>
+      </div>
+      <div class="skills-col">
+        <p class="skills-col-label">learning</p>
+        <div class="skill-row"><span class="skill-name">React</span><span class="skill-bar"><span class="skill-fill" style="--w:58%"></span></span></div>
+        <div class="skill-row"><span class="skill-name">C#</span><span class="skill-bar"><span class="skill-fill" style="--w:55%"></span></span></div>
+        <div class="skill-row"><span class="skill-name">SQL</span><span class="skill-bar"><span class="skill-fill" style="--w:52%"></span></span></div>
+        <div class="skill-row"><span class="skill-name">Next.js</span><span class="skill-bar"><span class="skill-fill" style="--w:45%"></span></span></div>
+      </div>
+      <div class="skills-col">
+        <p class="skills-col-label">exploring</p>
+        <div class="skill-row"><span class="skill-name">C++</span><span class="skill-bar"><span class="skill-fill" style="--w:35%"></span></span></div>
+        <div class="skill-row"><span class="skill-name">TypeScript</span><span class="skill-bar"><span class="skill-fill" style="--w:30%"></span></span></div>
+        <div class="skill-row"><span class="skill-name">Unity</span><span class="skill-bar"><span class="skill-fill" style="--w:32%"></span></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="end-path">
+  <div class="container">
+    <div class="marker-end"></div>
+    <p class="found-it">you made it this far. say hello.</p>
+
+    <div class="end-contact-form">
+      <div class="end-form-fields">
+        <input type="text" id="endName" placeholder="Your name" />
+        <input type="email" id="endEmail" placeholder="Your email" />
+        <textarea id="endMsg" placeholder="What's on your mind?"></textarea>
+        <div class="end-form-actions">
+          <button id="endSend" class="contact-btn primary">Send message</button>
+          <a href="https://keijoo.github.io/Keijo.Dev/Keinan-resume.pdf" download class="cv-download" style="margin-left: auto;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+              <path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Download CV
+          </a>
+        </div>
+        <p class="response-time">I usually reply within a day or two.</p>
+      </div>
+    </div>
+
+    <div class="end-links">
+      <a href="https://github.com/Keijoo" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.linkedin.com/in/keinan-jones/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://www.twitch.tv/keijo_/clips?range=all" target="_blank" rel="noopener">Twitch</a>
+      <a href="https://www.instagram.com/keij0_/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://keijoo.github.io/Keijo.Dev/" target="_blank" rel="noopener">Old site</a>
+    </div>
+  </div>
+</section>
+
+<!-- Contact modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" id="modalClose" aria-label="Close contact form">✕</button>
+    <p class="modal-eyebrow">send a message</p>
+    <h3 class="modal-title">Hey Keinan</h3>
+    <div class="modal-fields">
+      <input type="text" id="modalName" placeholder="Your name" />
+      <input type="email" id="modalEmail" placeholder="Your email" />
+      <textarea id="modalMsg" placeholder="What's on your mind?"></textarea>
+      <button id="modalSend" class="modal-send-btn">Send message</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  // Surface any silent script error instead of letting it die quietly
+  window.addEventListener('error', e => {
+    console.error('[page error]', e.message, 'at', e.filename + ':' + e.lineno);
+  });
+
+  // ---- Global: pause animations when tab is hidden, respect reduced motion ----
+  window.__tabActive = true;
+  window.__reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.addEventListener('visibilitychange', () => {
+    window.__tabActive = !document.hidden;
+  });
+
+  const marker = document.getElementById('marker');
+  const staticOverlay = document.getElementById('staticOverlay');
+  const cards = document.querySelectorAll('.waypoint .card');
+  const heroTitle = document.querySelector('.hero-title');
+  const heroLabel = document.querySelector('.hero-label');
+  const heroSub = document.querySelector('.hero-sub');
+  const heroPhoto = document.querySelector('.hero-photo-wrap');
+
+  function onScroll() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = Math.min(scrollTop / docHeight, 1);
+
+    marker.style.top = (progress * 100) + 'vh';
+    if (staticOverlay) staticOverlay.style.opacity = (progress * 0.25).toFixed(2);
+
+    const heroFade = Math.min(scrollTop / (window.innerHeight * 0.5), 1);
+    const heroOpacity = (1 - heroFade).toFixed(2);
+    const heroShift = (heroFade * 160).toFixed(1);
+    const heroScale = (1 - heroFade * 0.25).toFixed(3);
+    const heroBlur = (heroFade * 8).toFixed(1);
+    [heroTitle, heroLabel, heroSub, heroPhoto].forEach(el => {
+      if (el) {
+        el.style.opacity = heroOpacity;
+        el.style.transform = `translateY(-${heroShift}px) scale(${heroScale})`;
+        el.style.filter = `blur(${heroBlur}px)`;
+      }
+    });
+
+    cards.forEach(card => {
+      const rect = card.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.8) card.classList.add('visible');
+    });
+
+    const revealSelectors = [
+      '.found-it', '.constellation-label', '.skills-eyebrow',
+    ];
+    revealSelectors.forEach(sel => {
+      const el = document.querySelector(sel);
+      if (el && el.getBoundingClientRect().top < window.innerHeight * 0.85) {
+        el.classList.add('visible');
+      }
+    });
+
+    const revealIds = ['loveEyebrow', 'loveGrid'];
+    revealIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top < window.innerHeight * 0.85) {
+        el.classList.add('visible');
+      }
+    });
+
+    // Stats items staggered reveal
+    document.querySelectorAll('.stat-item').forEach((el, i) => {
+      if (el.getBoundingClientRect().top < window.innerHeight * 0.85) {
+        setTimeout(() => el.classList.add('visible'), i * 100);
+      }
+    });
+
+    // Skills columns reveal
+    const skillsCols = document.querySelector('.skills-columns');
+    if (skillsCols && skillsCols.getBoundingClientRect().top < window.innerHeight * 0.85) {
+      skillsCols.classList.add('visible');
+    }
+  }
+
+  window.addEventListener('scroll', onScroll);
+  try { onScroll(); } catch (e) { console.error('[onScroll initial call failed]', e); }
+
+  // ---- Finland days + years coding counter ----
+  (function() {
+    try {
+      const moveDate = new Date('2022-01-01'); // approx move date
+      const codeStart = new Date('2019-09-01'); // uni start
+      const now = new Date();
+      const finlandDays = Math.floor((now - moveDate) / (1000 * 60 * 60 * 24));
+      const yearsCode = ((now - codeStart) / (1000 * 60 * 60 * 24 * 365.25)).toFixed(1);
+      const dEl = document.getElementById('finlandDays');
+      const yEl = document.getElementById('yearsCount');
+      if (dEl) {
+        let count = 0;
+        const step = Math.ceil(finlandDays / 60);
+        const timer = setInterval(() => {
+          count = Math.min(count + step, finlandDays);
+          dEl.textContent = count.toLocaleString();
+          if (count >= finlandDays) clearInterval(timer);
+        }, 16);
+      }
+      if (yEl) yEl.textContent = yearsCode;
+    } catch (e) { console.error("[feature error]", e); }
+  })();
+
+  // ---- Inline end-form send (Formspree) ----
+  (function() {
+    try {
+      const sendBtn = document.getElementById('endSend');
+      if (!sendBtn) return;
+      sendBtn.addEventListener('click', async e => {
+        e.preventDefault();
+        const name = document.getElementById('endName').value.trim();
+        const email = document.getElementById('endEmail').value.trim();
+        const msg = document.getElementById('endMsg').value.trim();
+        if (!msg) { document.getElementById('endMsg').focus(); return; }
+        sendBtn.textContent = 'Sending...';
+        sendBtn.style.pointerEvents = 'none';
+        try {
+          const res = await fetch('https://formspree.io/f/mwpokzey', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ name, email, message: msg }),
+          });
+          const data = await res.json();
+          if (res.ok) {
+            sendBtn.textContent = 'Message sent!';
+            sendBtn.style.background = 'transparent';
+            sendBtn.style.color = 'var(--accent)';
+            document.getElementById('endName').value = '';
+            document.getElementById('endEmail').value = '';
+            document.getElementById('endMsg').value = '';
+          } else {
+            console.error('Formspree error:', data);
+            sendBtn.textContent = res.status === 0 ? 'Open via claude.ai to send' : 'Something went wrong';
+            sendBtn.style.pointerEvents = 'auto';
+          }
+        } catch(err) {
+          console.error('Formspree fetch error:', err);
+          sendBtn.textContent = 'Open via claude.ai to send';
+          sendBtn.style.pointerEvents = 'auto';
+        }
+      });
+    } catch (e) { console.error("[feature error]", e); }
+  })();
+
+  // ---- Contact modal (K shortcut) ----
+  (function() {
+    try {
+      const overlay = document.getElementById('modalOverlay');
+      const openBtn = document.getElementById('openModal');
+      const closeBtn = document.getElementById('modalClose');
+      const sendBtn = document.getElementById('modalSend');
+      if (!overlay) return;
+
+      function open() { overlay.classList.add('open'); document.body.style.overflow = 'hidden'; }
+      function close() { overlay.classList.remove('open'); document.body.style.overflow = ''; }
+
+      if (openBtn) openBtn.addEventListener('click', open);
+      if (closeBtn) closeBtn.addEventListener('click', close);
+      overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') close();
+        if ((e.key === 'k' || e.key === 'K') && !overlay.classList.contains('open') && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+          open();
+        }
+      });
+
+      if (sendBtn) {
+        sendBtn.addEventListener('click', async e => {
+          e.preventDefault();
+          const name = document.getElementById('modalName').value.trim();
+          const email = document.getElementById('modalEmail').value.trim();
+          const msg = document.getElementById('modalMsg').value.trim();
+          if (!msg) return;
+          sendBtn.textContent = 'Sending...';
+          sendBtn.style.pointerEvents = 'none';
+          try {
+            const res = await fetch('https://formspree.io/f/mwpokzey', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+              body: JSON.stringify({ name, email, message: msg }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+              sendBtn.textContent = 'Message sent!';
+              document.getElementById('modalName').value = '';
+              document.getElementById('modalEmail').value = '';
+              document.getElementById('modalMsg').value = '';
+              setTimeout(() => close(), 1800);
+            } else {
+              console.error('Formspree error:', data);
+              sendBtn.textContent = 'Something went wrong';
+              sendBtn.style.pointerEvents = 'auto';
+            }
+          } catch(err) {
+            console.error('Formspree fetch error:', err);
+            sendBtn.textContent = 'Something went wrong';
+            sendBtn.style.pointerEvents = 'auto';
+          }
+        });
+      }
+    } catch (e) { console.error("[feature error]", e); }
+  })();
+
+  // ---- Why hire me reveal ----
+  (function() {
+    try {
+      const eyebrow = document.getElementById('whyEyebrow');
+      const lines = document.getElementById('whyLines');
+      function check() {
+        if (eyebrow && eyebrow.getBoundingClientRect().top < window.innerHeight * 0.85) {
+          eyebrow.classList.add('visible');
+        }
+        if (lines && lines.getBoundingClientRect().top < window.innerHeight * 0.85) {
+          lines.classList.add('visible');
+        }
+      }
+      window.addEventListener('scroll', check);
+      check();
+    } catch (e) { console.error("[feature error]", e); }
+  })();
+
+  // ---- Last updated date ----
+  (function() {
+    try {
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const now = new Date();
+      const label = `${months[now.getMonth()]} ${now.getFullYear()}`;
+      ['lastUpdated','lastUpdated2'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = label;
+      });
+    } catch (e) { console.error("[feature error]", e); }
+  })();
+
+  // ---- audio toggle ----
+  (function() {
+    try {
+      const btn = document.getElementById('audioBtn');
+      const audio = document.getElementById('ambientAudio');
+      if (!btn || !audio) return;
+      let playing = false;
+      const TARGET_VOL = 0.12;
+      audio.volume = 0;
+
+      function fadeIn() {
+        audio.volume = 0;
+        audio.play().catch(() => {});
+        const step = setInterval(() => {
+          if (audio.volume < TARGET_VOL - 0.01) {
+            audio.volume = Math.min(audio.volume + 0.01, TARGET_VOL);
+          } else {
+            audio.volume = TARGET_VOL;
+            clearInterval(step);
+          }
+        }, 80);
+      }
+
+      function fadeOut() {
+        const step = setInterval(() => {
+          if (audio.volume > 0.01) {
+            audio.volume = Math.max(audio.volume - 0.01, 0);
+          } else {
+            audio.volume = 0;
+            audio.pause();
+            clearInterval(step);
+          }
+        }, 80);
+      }
+
+      btn.addEventListener('click', () => {
+        if (playing) {
+          fadeOut();
+          btn.classList.remove('playing');
+          btn.textContent = '♪';
+        } else {
+          fadeIn();
+          btn.classList.add('playing');
+          btn.textContent = '♫';
+        }
+        playing = !playing;
+      });
+    } catch (e) { console.error("[feature error]", e); }
+  })();
+
+  // ---- cursor trail (+ idle doodle) ----
+  (function() {
+    try {
+      const canvas = document.getElementById('trailCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      let mouse = { x: -999, y: -999 };
+      let idleTimer = null;
+      let isIdle = false;
+      let doodle = null;
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      window.addEventListener('resize', resize);
+      resize();
+
+      function resetIdle() {
+        isIdle = false;
+        doodle = null;
+        clearTimeout(idleTimer);
+        if (!window.__reducedMotion) {
+          idleTimer = setTimeout(() => { isIdle = true; startDoodle(); }, 10000);
+        }
+      }
+
+      function startDoodle() {
+        // Wandering point that draws a slow, lazy loop somewhere on screen
+        doodle = {
+          x: window.innerWidth / 2 + (Math.random() - 0.5) * 200,
+          y: window.innerHeight / 2 + (Math.random() - 0.5) * 200,
+          angle: Math.random() * Math.PI * 2,
+          t: 0,
+        };
+      }
+
+      ['mousemove', 'keydown', 'scroll', 'touchstart', 'wheel'].forEach(evt => {
+        window.addEventListener(evt, resetIdle, { passive: true });
+      });
+      resetIdle();
+
+      window.addEventListener('mousemove', e => {
+        if (window.__reducedMotion) return;
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+        for (let i = 0; i < 2; i++) {
+          particles.push({
+            x: mouse.x + (Math.random() - 0.5) * 6,
+            y: mouse.y + (Math.random() - 0.5) * 6,
+            r: Math.random() * 2.5 + 0.8,
+            alpha: 0.7 + Math.random() * 0.3,
+            decay: 0.03 + Math.random() * 0.03,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5,
+          });
+        }
+      });
+
+      function loop() {
+        if (!window.__tabActive || window.__reducedMotion) {
+          requestAnimationFrame(loop);
+          return;
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Idle doodle: page draws a slow lazy wandering trail on its own
+        if (isIdle && doodle) {
+          doodle.t += 0.012;
+          doodle.angle += (Math.random() - 0.5) * 0.15;
+          doodle.x += Math.cos(doodle.angle) * 0.8;
+          doodle.y += Math.sin(doodle.angle) * 0.8;
+          // Keep it gently within the viewport
+          if (doodle.x < 60) doodle.angle = 0;
+          if (doodle.x > window.innerWidth - 60) doodle.angle = Math.PI;
+          if (doodle.y < 60) doodle.angle = Math.PI / 2;
+          if (doodle.y > window.innerHeight - 60) doodle.angle = -Math.PI / 2;
+
+          particles.push({
+            x: doodle.x, y: doodle.y,
+            r: 1.2 + Math.sin(doodle.t * 3) * 0.6,
+            alpha: 0.35,
+            decay: 0.012,
+            vx: 0, vy: 0,
+          });
+        }
+
+        particles = particles.filter(p => p.alpha > 0.01);
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.alpha -= p.decay;
+          p.r *= 0.97;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 107, 74, ${p.alpha})`;
+          ctx.fill();
+        });
+        requestAnimationFrame(loop);
+      }
+
+      loop();
+    } catch (e) { console.error("[feature error]", e); }
+  })();
+
+  // ---- Finland photos: staggered reveal + 3D tilt ----
+  (function() {
+    try {
+      const items = document.querySelectorAll('.photo-item');
+      if (!items.length) return;
+
+      // Option A: staggered scroll-triggered fade-in per photo
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.2 });
+
+      items.forEach(item => observer.observe(item));
+
+      // Option C: 3D tilt on mouse move across the section
+      const frame = document.getElementById('photoFrame');
+      if (!frame || window.__reducedMotion) return;
+
+      frame.addEventListener('mousemove', (e) => {
+        const rect = frame.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = (e.clientX - cx) / (rect.width / 2);
+        const dy = (e.clientY - cy) / (rect.height / 2);
+
+        items.forEach((item, i) => {
+          // Each photo tilts slightly differently for depth
+          const factor = 1 + i * 0.15;
+          const rotX = -dy * 6 * factor;
+          const rotY = dx * 6 * factor;
+          item.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(0)`;
+          item.style.transition = 'transform 0.15s ease, opacity 0.8s ease';
+        });
+      });
+
+      frame.addEventListener('mouseleave', () => {
+        items.forEach(item => {
+          item.style.transform = '';
+          item.style.transition = 'transform 0.5s ease, opacity 0.8s ease';
+        });
+      });
+
+    } catch(e) { console.error('[feature error]', e); }
+  })();
+
+  // ---- Sagittarius click acknowledgment ----
+  (function() {
+    try {
+      const sag = document.querySelector('.sagittarius-bg');
+      if (!sag) { console.log('[easter egg] sagittarius element not found'); return; }
+      let clicks = 0;
+      let acknowledged = false;
+
+      const tooltip = document.createElement('div');
+      tooltip.className = 'sag-tooltip';
+      tooltip.textContent = '♐ that\'s my sign';
+      document.body.appendChild(tooltip);
+
+      // Known star positions in the SVG's viewBox coordinate space (0-500)
+      const starPoints = [
+        [300,360],[375,275],[290,270],[285,235],[350,340],[310,215],
+        [340,290],[125,250],[110,275],[385,315],[230,290],[240,355],
+        [180,320],[140,300],[440,125],[416,142],[376,142]
+      ];
+
+      function registerHit() {
+        if (acknowledged) return;
+        clicks++;
+        console.log('[easter egg] sagittarius click', clicks, '/ 5');
+        if (clicks >= 5) {
+          acknowledged = true;
+          sag.classList.add('acknowledged');
+          tooltip.classList.add('visible');
+          setTimeout(() => tooltip.classList.remove('visible'), 3000);
+          setTimeout(() => sag.classList.remove('acknowledged'), 1300);
+        }
+      }
+
+      document.addEventListener('click', (e) => {
+        const rect = sag.getBoundingClientRect();
+        // Convert click position into the SVG's internal 0-500 coordinate space
+        const scaleX = 500 / rect.width;
+        const scaleY = 500 / rect.height;
+        const localX = (e.clientX - rect.left) * scaleX;
+        const localY = (e.clientY - rect.top) * scaleY;
+
+        // Click must be within the visible sagittarius bounding box at all
+        if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) return;
+
+        const hit = starPoints.some(([sx, sy]) => {
+          const d = Math.hypot(localX - sx, localY - sy);
+          return d < 35; // generous tolerance in viewBox units
+        });
+        if (hit) registerHit();
+      });
+    } catch (e) { console.error("[feature error]", e); }
+  })();
+
+  // ---- skills constellation ----
+  (function() {
+    try {
+      const canvas = document.getElementById('constellationCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      const skills = [
+        { name: 'JavaScript', weight: 3 },
+        { name: 'HTML / CSS', weight: 3 },
+        { name: 'Python', weight: 2.5 },
+        { name: 'React', weight: 2 },
+        { name: 'C#', weight: 2 },
+        { name: 'C++', weight: 1.8 },
+        { name: 'SQL', weight: 1.8 },
+        { name: 'Unreal Engine', weight: 2.5 },
+        { name: 'Unity', weight: 1.5 },
+        { name: 'Next.js', weight: 1.8 },
+        { name: 'Git', weight: 2 },
+        { name: 'Finnish B1', weight: 1.5 },
+      ];
+
+      const connections = [
+        [0,1],[0,2],[0,4],[1,3],[1,5],[2,9],[3,10],[4,7],[5,6],[6,10],[7,8],[8,3],[9,0],[10,1],[11,6]
+      ];
+
+      let nodes = [];
+      let tick = 0;
+      let animFrame;
+      let revealed = false;
+
+      function layout() {
+        const w = canvas.offsetWidth;
+        const h = canvas.offsetHeight;
+        canvas.width = w * devicePixelRatio;
+        canvas.height = h * devicePixelRatio;
+        ctx.scale(devicePixelRatio, devicePixelRatio);
+
+        nodes = skills.map((s, i) => {
+          const angle = (i / skills.length) * Math.PI * 2 - Math.PI / 2;
+          const rx = w * 0.38;
+          const ry = h * 0.38;
+          const jitter = () => (Math.random() - 0.5) * w * 0.08;
+          return {
+            x: w / 2 + Math.cos(angle) * rx + jitter(),
+            y: h / 2 + Math.sin(angle) * ry + jitter(),
+            r: 2 + s.weight * 1.2,
+            name: s.name,
+            phase: Math.random() * Math.PI * 2,
+            speed: 0.4 + Math.random() * 0.4,
+            w, h
+          };
+        });
+      }
+
+      function draw() {
+        if (!window.__tabActive) {
+          animFrame = requestAnimationFrame(draw);
+          return;
+        }
+        const w = canvas.width / devicePixelRatio;
+        const h = canvas.height / devicePixelRatio;
+        ctx.clearRect(0, 0, w, h);
+        tick += 0.016;
+
+        connections.forEach(([a, b]) => {
+          if (!nodes[a] || !nodes[b]) return;
+          const dx = nodes[b].x - nodes[a].x;
+          const dy = nodes[b].y - nodes[a].y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          const opacity = Math.max(0.15, 0.45 - dist / 1800);
+          ctx.strokeStyle = `rgba(255, 107, 74, ${opacity})`;
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(nodes[a].x, nodes[a].y);
+          ctx.lineTo(nodes[b].x, nodes[b].y);
+          ctx.stroke();
+        });
+
+        nodes.forEach((n) => {
+          const twinkle = 0.5 + 0.5 * Math.sin(tick * n.speed + n.phase);
+          const glowR = n.r * (4 + twinkle * 3);
+          const grd = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, glowR);
+          grd.addColorStop(0, `rgba(255,107,74,${0.75 * twinkle})`);
+          grd.addColorStop(0.4, `rgba(255,107,74,${0.3 * twinkle})`);
+          grd.addColorStop(1, 'rgba(255,107,74,0)');
+          ctx.fillStyle = grd;
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, glowR, 0, Math.PI * 2);
+          ctx.fill();
+
+          const armScale = 0.6 + twinkle * 0.8;
+          const crossLen = n.r * armScale * 1.8;
+          ctx.strokeStyle = `rgba(255,220,200,${0.4 + 0.4 * twinkle})`;
+          ctx.lineWidth = 0.7;
+          ctx.beginPath();
+          ctx.moveTo(n.x - crossLen, n.y);
+          ctx.lineTo(n.x + crossLen, n.y);
+          ctx.moveTo(n.x, n.y - crossLen);
+          ctx.lineTo(n.x, n.y + crossLen);
+          ctx.stroke();
+
+          ctx.fillStyle = `rgba(255,250,245,${0.7 + 0.3 * twinkle})`;
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, n.r * (0.7 + twinkle * 0.5), 0, Math.PI * 2);
+          ctx.fill();
+
+          const labelOpacity = 0.65 + 0.35 * twinkle;
+          ctx.fillStyle = `rgba(232,230,225,${labelOpacity})`;
+          ctx.font = `${10 + n.r * 0.5}px JetBrains Mono, monospace`;
+          ctx.textAlign = 'center';
+          ctx.fillText(n.name, n.x, n.y - n.r - 10);
+        });
+
+        animFrame = requestAnimationFrame(draw);
+      }
+
+      function init() {
+        layout();
+        if (!animFrame) draw();
+      }
+
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting && !revealed) {
+            revealed = true;
+            canvas.classList.add('visible');
+            const label = document.querySelector('.constellation-label');
+            if (label) label.classList.add('visible');
+            init();
+          }
+        });
+      }, { threshold: 0.3 });
+
+      observer.observe(canvas);
+      window.addEventListener('resize', () => { if (revealed) layout(); });
+    } catch (e) { console.error("[feature error]", e); }
+  })();
+
+  // ---- A little something for the curious ----
+  console.log('%cHey, you opened the console.', 'color: #ff6b4a; font-family: monospace; font-size: 14px; font-weight: bold;');
+  console.log('%cIf you are reading this, you are either debugging something, or you are the kind of person who checks under the hood. I like that.', 'color: #c9a87c; font-family: monospace; font-size: 12px;');
+  console.log('%cTry the konami code. Up Up Down Down Left Right Left Right B A', 'color: #8a8a96; font-family: monospace; font-size: 11px;');
+  console.log('%cOn mobile? Tap the ♪ button 7 times quickly.', 'color: #4a5568; font-family: monospace; font-size: 11px;');
+
+  (function() {
+    try {
+      const sequence = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+      let progress = 0;
+      document.addEventListener('keydown', e => {
+        const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+        if (key === sequence[progress]) {
+          progress++;
+          if (progress === sequence.length) {
+            progress = 0;
+            triggerSecret();
+          }
+        } else {
+          progress = (key === sequence[0]) ? 1 : 0;
+        }
+      });
+
+      // Mobile trigger: tap the audio button 7 times within 4 seconds
+      const audioBtn = document.getElementById('audioBtn');
+      if (audioBtn) {
+        let tapCount = 0;
+        let tapTimer = null;
+        audioBtn.addEventListener('touchstart', e => {
+          tapCount++;
+          clearTimeout(tapTimer);
+          if (tapCount >= 7) {
+            tapCount = 0;
+            e.preventDefault();
+            e.stopPropagation();
+            triggerSecret();
+          } else {
+            tapTimer = setTimeout(() => { tapCount = 0; }, 4000);
+          }
+        }, { passive: false });
+      }
+
+      function triggerSecret() {
+        // ---- Phase 1: Visual spectacle ----
+        const overlay = document.createElement('canvas');
+        overlay.style.cssText = `position:fixed;inset:0;width:100%;height:100%;z-index:99990;pointer-events:none;`;
+        overlay.width = window.innerWidth;
+        overlay.height = window.innerHeight;
+        document.body.appendChild(overlay);
+        const octx = overlay.getContext('2d');
+
+        let glitchTick = 0;
+        const glitchStart = performance.now();
+        const SPECTACLE_MS = 2800;
+
+        function drawGlitch(now) {
+          const elapsed = now - glitchStart;
+          if (elapsed > SPECTACLE_MS) {
+            overlay.remove();
+            startGame();
+            return;
+          }
+          glitchTick++;
+          const w = overlay.width, h = overlay.height;
+          octx.clearRect(0, 0, w, h);
+
+          // Scanlines
+          for (let y = 0; y < h; y += 4) {
+            octx.fillStyle = `rgba(0,0,0,${0.18 + Math.sin(glitchTick * 0.3 + y * 0.1) * 0.06})`;
+            octx.fillRect(0, y, w, 2);
+          }
+
+          // RGB channel split strips
+          const strips = Math.floor(3 + Math.random() * 6);
+          for (let i = 0; i < strips; i++) {
+            const sy = Math.random() * h;
+            const sh = 2 + Math.random() * 18;
+            const offset = (Math.random() - 0.5) * 20;
+            octx.fillStyle = `rgba(255,107,74,${0.05 + Math.random() * 0.12})`;
+            octx.fillRect(offset, sy, w, sh);
+            octx.fillStyle = `rgba(100,200,255,${0.04 + Math.random() * 0.08})`;
+            octx.fillRect(-offset * 0.5, sy + 1, w, sh);
+          }
+
+          // Horizontal glitch tears
+          if (Math.random() > 0.6) {
+            const ty = Math.random() * h;
+            octx.fillStyle = `rgba(255,107,74,${Math.random() * 0.15})`;
+            octx.fillRect(0, ty, w, 1 + Math.random() * 3);
+          }
+
+          // Burst particles from center
+          const cx = w / 2, cy = h / 2;
+          const progress = elapsed / SPECTACLE_MS;
+          const bursts = Math.floor(4 + progress * 12);
+          for (let i = 0; i < bursts; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const dist = progress * Math.min(w, h) * 0.55 * Math.random();
+            const px = cx + Math.cos(angle) * dist;
+            const py = cy + Math.sin(angle) * dist;
+            const size = 1 + Math.random() * 3;
+            octx.fillStyle = `rgba(255,${100 + Math.random() * 155},74,${0.6 + Math.random() * 0.4})`;
+            octx.beginPath();
+            octx.arc(px, py, size, 0, Math.PI * 2);
+            octx.fill();
+          }
+
+          // Vignette pulse
+          const vg = octx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(w, h) * 0.7);
+          vg.addColorStop(0, 'rgba(255,107,74,0)');
+          vg.addColorStop(0.7, 'rgba(255,107,74,0)');
+          vg.addColorStop(1, `rgba(255,107,74,${0.1 + Math.sin(glitchTick * 0.2) * 0.08})`);
+          octx.fillStyle = vg;
+          octx.fillRect(0, 0, w, h);
+
+          requestAnimationFrame(drawGlitch);
+        }
+
+        // Shake body
+        document.body.style.transition = 'none';
+        let shakeCount = 0;
+        const shakeInterval = setInterval(() => {
+          const dx = (Math.random() - 0.5) * 6;
+          const dy = (Math.random() - 0.5) * 4;
+          document.body.style.transform = `translate(${dx}px,${dy}px)`;
+          if (++shakeCount > 18) {
+            clearInterval(shakeInterval);
+            document.body.style.transform = '';
+          }
+        }, 60);
+
+        requestAnimationFrame(drawGlitch);
+
+        // ---- Phase 2: Star catch mini game ----
+        function startGame() {
+          const GAME_DURATION = 15000;
+          let score = 0;
+          let gameOver = false;
+
+          // Backdrop
+          const backdrop = document.createElement('div');
+          backdrop.style.cssText = `
+            position:fixed;inset:0;background:rgba(10,10,15,0.92);
+            z-index:99991;backdrop-filter:blur(4px);
+            display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+            padding-top:4vh;
+          `;
+          document.body.appendChild(backdrop);
+          document.body.style.overflow = 'hidden';
+
+          // Header
+          const header = document.createElement('div');
+          header.style.cssText = `text-align:center;margin-bottom:1rem;`;
+          header.innerHTML = `
+            <p style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;letter-spacing:0.3em;text-transform:uppercase;color:#ff6b4a;margin-bottom:0.4rem;">secret path unlocked</p>
+            <p style="font-family:'JetBrains Mono',monospace;font-size:1.2rem;color:#e8e6e1;">catch the falling stars</p>
+          `;
+          backdrop.appendChild(header);
+
+          // Timer + score bar
+          const hud = document.createElement('div');
+          hud.style.cssText = `display:flex;gap:3rem;margin-bottom:1rem;font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:#8a8a96;`;
+          hud.innerHTML = `<span>score: <strong id="ks" style="color:#ff6b4a">0</strong></span><span>time: <strong id="kt" style="color:#ff6b4a">15</strong>s</span>`;
+          backdrop.appendChild(hud);
+
+          // Game canvas
+          const gc = document.createElement('canvas');
+          const maxW = Math.min(window.innerWidth - 32, 500);
+          const maxH = Math.min(window.innerHeight * 0.62, 420);
+          gc.width = maxW; gc.height = maxH;
+          gc.style.cssText = `border:1px solid #2a2a35;border-radius:4px;cursor:crosshair;display:block;touch-action:none;`;
+          backdrop.appendChild(gc);
+          const gctx = gc.getContext('2d');
+
+          // Close hint
+          const hint = document.createElement('p');
+          hint.style.cssText = `font-family:'JetBrains Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;color:#4a5568;margin-top:0.75rem;`;
+          hint.textContent = 'click or tap the stars · esc to quit';
+          backdrop.appendChild(hint);
+
+          // Stars
+          const stars = [];
+          function spawnStar() {
+            if (gameOver) return;
+            const size = 8 + Math.random() * 10;
+            stars.push({
+              x: size + Math.random() * (gc.width - size * 2),
+              y: -size,
+              r: size,
+              speed: 1.2 + Math.random() * 2.2,
+              alpha: 0.8 + Math.random() * 0.2,
+              caught: false,
+              pop: 0,
+              accent: Math.random() > 0.75,
+            });
+          }
+
+          // Spawn interval
+          let spawnTimer = setInterval(spawnStar, 600);
+
+          // Timer countdown
+          let remaining = 15;
+          const countTimer = setInterval(() => {
+            remaining--;
+            const el = document.getElementById('kt');
+            if (el) el.textContent = remaining;
+            if (remaining <= 0) endGame();
+          }, 1000);
+
+          // Draw loop
+          let animId;
+          function loop() {
+            if (gameOver) return;
+            gctx.fillStyle = '#0a0a0f';
+            gctx.fillRect(0, 0, gc.width, gc.height);
+
+            // Draw subtle grid lines
+            gctx.strokeStyle = 'rgba(255,107,74,0.04)';
+            gctx.lineWidth = 1;
+            for (let x = 0; x < gc.width; x += 40) { gctx.beginPath(); gctx.moveTo(x,0); gctx.lineTo(x,gc.height); gctx.stroke(); }
+            for (let y = 0; y < gc.height; y += 40) { gctx.beginPath(); gctx.moveTo(0,y); gctx.lineTo(gc.width,y); gctx.stroke(); }
+
+            for (let i = stars.length - 1; i >= 0; i--) {
+              const s = stars[i];
+              if (!s.caught) {
+                s.y += s.speed;
+                if (s.y - s.r > gc.height) { stars.splice(i, 1); continue; }
+              } else {
+                s.pop += 0.18;
+                if (s.pop > 1) { stars.splice(i, 1); continue; }
+              }
+
+              const col = s.accent ? '255,107,74' : '255,220,160';
+              const tw = 0.5 + 0.5 * Math.sin(Date.now() * 0.003 * s.speed + i);
+              const drawR = s.caught ? s.r * (1 + s.pop * 1.5) : s.r;
+              const drawAlpha = s.caught ? s.alpha * (1 - s.pop) : s.alpha * (0.7 + 0.3 * tw);
+
+              // Glow
+              const grd = gctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, drawR * 2.5);
+              grd.addColorStop(0, `rgba(${col},${drawAlpha * 0.6})`);
+              grd.addColorStop(1, `rgba(${col},0)`);
+              gctx.fillStyle = grd;
+              gctx.beginPath(); gctx.arc(s.x, s.y, drawR * 2.5, 0, Math.PI * 2); gctx.fill();
+
+              // Star dot
+              gctx.fillStyle = `rgba(${col},${drawAlpha})`;
+              gctx.beginPath(); gctx.arc(s.x, s.y, drawR * (s.caught ? 1 : 0.7 + 0.3 * tw), 0, Math.PI * 2); gctx.fill();
+
+              // Cross sparkle
+              if (!s.caught) {
+                const al = drawR * 0.9 * (0.5 + 0.5 * tw);
+                gctx.strokeStyle = `rgba(${col},${drawAlpha * 0.8})`;
+                gctx.lineWidth = 1;
+                gctx.beginPath();
+                gctx.moveTo(s.x - al, s.y); gctx.lineTo(s.x + al, s.y);
+                gctx.moveTo(s.x, s.y - al); gctx.lineTo(s.x, s.y + al);
+                gctx.stroke();
+              }
+            }
+
+            animId = requestAnimationFrame(loop);
+          }
+
+          function hitTest(cx, cy) {
+            for (const s of stars) {
+              if (s.caught) continue;
+              const d = Math.hypot(cx - s.x, cy - s.y);
+              if (d < s.r * 2) {
+                s.caught = true;
+                score++;
+                const el = document.getElementById('ks');
+                if (el) el.textContent = score;
+                return;
+              }
+            }
+          }
+
+          gc.addEventListener('click', e => {
+            const rect = gc.getBoundingClientRect();
+            hitTest(e.clientX - rect.left, e.clientY - rect.top);
+          });
+
+          gc.addEventListener('touchstart', e => {
+            e.preventDefault();
+            const rect = gc.getBoundingClientRect();
+            Array.from(e.changedTouches).forEach(t => hitTest(t.clientX - rect.left, t.clientY - rect.top));
+          }, { passive: false });
+
+          document.addEventListener('keydown', function escHandler(e) {
+            if (e.key === 'Escape') { endGame(); document.removeEventListener('keydown', escHandler); }
+          });
+
+          function endGame() {
+            if (gameOver) return;
+            gameOver = true;
+            clearInterval(spawnTimer);
+            clearInterval(countTimer);
+            cancelAnimationFrame(animId);
+
+            // Score message
+            let msg;
+            if (score === 0) msg = "you didn't catch a single one. that's okay. the path was enough.";
+            else if (score < 5) msg = `${score} stars caught. not bad for someone who just broke the code.`;
+            else if (score < 10) msg = `${score} stars. you've got good hands. or good timing.`;
+            else if (score < 15) msg = `${score} stars. honestly impressive. I didn't think anyone would get that many.`;
+            else msg = `${score} stars. I don't even know how you did that. well done.`;
+
+            gctx.fillStyle = '#0a0a0f';
+            gctx.fillRect(0, 0, gc.width, gc.height);
+            gctx.font = `bold ${Math.min(gc.width * 0.12, 52)}px JetBrains Mono, monospace`;
+            gctx.fillStyle = '#ff6b4a';
+            gctx.textAlign = 'center';
+            gctx.fillText(score, gc.width / 2, gc.height * 0.38);
+            gctx.font = `${Math.min(gc.width * 0.04, 15)}px JetBrains Mono, monospace`;
+            gctx.fillStyle = '#8a8a96';
+            // Word wrap the message
+            const words = msg.split(' ');
+            let line = '', lines = [], maxW = gc.width * 0.85;
+            for (const w of words) {
+              const test = line + (line ? ' ' : '') + w;
+              if (gctx.measureText(test).width > maxW && line) { lines.push(line); line = w; }
+              else line = test;
+            }
+            if (line) lines.push(line);
+            lines.forEach((l, i) => gctx.fillText(l, gc.width / 2, gc.height * 0.52 + i * 22));
+
+            // Close button
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = 'back to the path';
+            closeBtn.style.cssText = `
+              margin-top:1.2rem;background:transparent;border:1px solid #ff6b4a;
+              color:#ff6b4a;font-family:'JetBrains Mono',monospace;font-size:0.78rem;
+              letter-spacing:0.12em;text-transform:uppercase;padding:0.7rem 1.8rem;
+              border-radius:3px;cursor:pointer;
+            `;
+            closeBtn.addEventListener('click', () => {
+              backdrop.remove();
+              document.body.style.overflow = '';
+            });
+            backdrop.appendChild(closeBtn);
+          }
+
+          loop();
+          spawnStar();
+        }
+      }
+
+    } catch (e) { console.error("[feature error]", e); }
+  })();
+
+</script>
+
+</body>
+</html>
